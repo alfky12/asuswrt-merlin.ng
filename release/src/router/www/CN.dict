@@ -218,6 +218,7 @@ TM_eula_withdraw_desc1=请注意，Trend Micro 将通过以上功能收集您的
 TM_eula_withdraw_desc2=如果您不想通过以上功能与 Trend Micro 分享信息，请点击下方<span style="font-weight: bold;">[撤销]</span>选项。请注意，一旦您停止与 Trend Micro 间的信息分享，上述功能将被停用。
 withdraw_confirm=请确认是否关闭？
 withdraw_str=撤销
+Assassin_Mode=刺客模式
 asusddns_inputhint=请输入名称
 asusddns_rm_account_hint=该主机名称已绑定于路由器应用程序的登录账号，请从路由器应用程序中注销或刪除
 Auto=自动
