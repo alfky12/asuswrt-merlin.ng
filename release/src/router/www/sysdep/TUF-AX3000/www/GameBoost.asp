@@ -145,7 +145,7 @@ body{
 	background: #248DFF;
 }
 
-@media all and (-ms-high-contrast:none)
+@media all and (forced-colors:none)
 {
     *::-ms-backdrop, .container::after { margin-top: 0px} /* IE11 */
 }
@@ -721,22 +721,22 @@ function enableGearUp(){
 <div>
 	<table class="content" align="center" cellspacing="0" style="margin:auto;">
 		<tr>
-			<td width="14">&nbsp;</td>
+			<td width="15">&nbsp;</td>
 			<!--=====Beginning of Main Menu=====-->
 			<td valign="top" width="202">
 				<div id="mainMenu"></div>
 				<div id="subMenu"></div>
 			</td>
 			<td valign="top">
-				<div id="tabMenu" style="*margin-top: -160px;"></div>
+				<div id="tabMenu" style="margin-top: -155px;"></div>
 				<br>
 		<!--=====Beginning of Main Content=====-->
 				<div id="FormTitle">
 					<table style="padding-left:10px;">
 						<tr>
 							<td class="formfonttitle">
-								<div style="width:730px;padding-top:10px;">
-									<table width="730px">
+								<div style="width:743px;padding-top:10px;">
+									<table width="743px">
 										<tr>
 											<td align="left">
 
