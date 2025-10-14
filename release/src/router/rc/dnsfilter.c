@@ -251,6 +251,9 @@ void dnsfilter_settings(FILE *fp) {
 			} else if (dnsmode == DNSF_SRV_ROUTER) {
 				fprintf(fp, "-A DNSFILTER -m mac --mac-source %s -j REDIRECT\n",
 					mac);
+			} else if (dnsmode == DNSF_SRV_ROUTER) {
+				fprintf(fp, "-A DNSFILTER -m mac --mac-source %s -j REDIRECT\n",
+					mac);
 			} else if (get_dns_filter(AF_INET, dnsmode, &dnsfsrv)) {
 				fprintf(fp,"-A DNSFILTER -m mac --mac-source %s -j DNAT --to-destination %s\n",
 					mac, dnsfsrv.server1);
