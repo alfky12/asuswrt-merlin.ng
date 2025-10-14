@@ -1,7 +1,19 @@
 Asuswrt-Merlin GNUton's builds Changelog
 ========================
 
+3004.388.10_1-gnuton1 (XX-XXX-20XX)
+  - FUPDATED: Upstream code to 3004.388.10
+
 3004.388.10 (4-Oct-2025)
+  - NOTE: For developers, please note that the new default branch
+          is now called "main" - it's what was previously the
+          3006.102 branch.
+          The "master" branch has been renamed "master-old", and
+          is no longer actively used.  Due to how the 3006.102
+          branch diverged, it was easier to do it this way than
+          to fold back 3006.102 on top of master.
+          3004.388 remains where 3004.388 models live.
+
   - NOTE: Due to numerous webui changes, it's recommended to
           force refresh the page after first login, or clear
           your browser cache.
@@ -22,6 +34,7 @@ Asuswrt-Merlin GNUton's builds Changelog
 
   - NEW: Added Control-D servers to DNS-over-TLS
          presets (dave14305)
+  - UPDATED: Merged GPL 388_25523.
   - UPDATED: dropbear to 2025.88.
   - CHANGED: Setting DNS Director to "Router" will now always
              redirect to the router's own IP.  Previously it
@@ -57,8 +70,6 @@ Asuswrt-Merlin GNUton's builds Changelog
   - FIXED: Additionnal fix for the status frame missing from
            Network Map under certain hostnames.
   - FIXED: CVE-2025-9230 in OpenSSL (backport by RSDNTWK).
-
-
 
 3004.388.9_2-gnuton2 (31-Jul-2025)
   - FIXED: Resolved flashing issues on RT-AX82U v2 and RT-AX5400
@@ -2389,4 +2400,3 @@ Asuswrt-Merlin GNUton's builds Changelog
               match with Asus' own supported list)
    - REMOVED: "Custom" OpenVPN authentication mode (which probably
               nobody used or even understood).
-
