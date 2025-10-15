@@ -319,7 +319,6 @@ define(function(){
 					{url: "Advanced_Notification_Content.asp", tabName: "Notification"},
 					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "Advanced_Privacy.asp", tabName: "<#menu_privacy#>"},
-					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				]
 			},
