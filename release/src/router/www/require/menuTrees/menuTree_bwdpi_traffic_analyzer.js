@@ -118,10 +118,10 @@ define(function(){
 				] 
 			},
 			{
-				menuName: "网易UU加速器",
+				menuName: "<#UU_Accelerator#>",
 				index: "menu_UU", 
 				tab: [
-					{url: "UUAccelerator.asp", tabName: "网易UU加速器"},
+					{url: "UUAccelerator.asp", tabName: "<#UU_Accelerator#>"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				] 
 			},
@@ -129,6 +129,7 @@ define(function(){
 				menuName: "<#Traffic_Analyzer#>",
 				index: "menu_TrafficAnalyzer", 
 				tab: [
+					{url: "TrafficAnalyzer_Statistic.asp", tabName: "<#Statistic#>"},
 					{url: "Main_TrafficMonitor_realtime.asp", tabName: "<#traffic_monitor#>"},
 					{url: "Main_TrafficMonitor_last24.asp", tabName: "__INHERIT__"},
 					{url: "Main_TrafficMonitor_daily.asp", tabName: "__INHERIT__"},
@@ -136,7 +137,7 @@ define(function(){
 					{url: "Main_TrafficMonitor_settings.asp", tabName: "Monitoring Settings"},
 					{url: "TrafficAnalyzer_Statistic.asp", tabName: "<#Statistic#>"},
 					{url: "AdaptiveQoS_TrafficLimiter.asp", tabName: "Traffic Limiter"},
-                                        {url: "NULL", tabName: "__INHERIT__"}
+					{url: "NULL", tabName: "__INHERIT__"}
 				] 
 			},
 			{
@@ -317,6 +318,7 @@ define(function(){
 					{url: "Advanced_TR069_Content.asp", tabName: "TR-069"},
 					{url: "Advanced_OAM_Content.asp", tabName: "OAM"},
 					{url: "Advanced_Notification_Content.asp", tabName: "Notification"},
+					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "Advanced_Privacy.asp", tabName: "<#menu_privacy#>"},
 					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "NULL", tabName: "__INHERIT__"}
