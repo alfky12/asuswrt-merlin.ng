@@ -75,6 +75,9 @@ function applyRule(){
 
 	document.form.ct_udp_timeout.value = document.form.udp_unreplied.value + " "+document.form.udp_assured.value;
 
+	if (getRadioValue(document.form.dns_local_cache) != "<% nvram_get("dns_local_cache"); %>")
+		document.form.action_script.value += ";restart_dnsmasq";
+
 	document.form.submit();
 }
 

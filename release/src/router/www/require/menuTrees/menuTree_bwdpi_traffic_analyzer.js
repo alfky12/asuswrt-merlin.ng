@@ -134,10 +134,8 @@ define(function(){
 					{url: "Main_TrafficMonitor_last24.asp", tabName: "__INHERIT__"},
 					{url: "Main_TrafficMonitor_daily.asp", tabName: "__INHERIT__"},
 					{url: "Main_TrafficMonitor_monthly.asp", tabName: "__INHERIT__"},
-					{url: "Main_TrafficMonitor_devrealtime.asp", tabName: "__INHERIT__"},
-					{url: "Main_TrafficMonitor_devdaily.asp", tabName: "__INHERIT__"},
-					{url: "Main_TrafficMonitor_devmonthly.asp", tabName: "__INHERIT__"},
 					{url: "Main_TrafficMonitor_settings.asp", tabName: "Monitoring Settings"},
+					{url: "TrafficAnalyzer_Statistic.asp", tabName: "<#Statistic#>"},
 					{url: "AdaptiveQoS_TrafficLimiter.asp", tabName: "Traffic Limiter"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				] 
@@ -322,6 +320,7 @@ define(function(){
 					{url: "Advanced_Notification_Content.asp", tabName: "Notification"},
 					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "Advanced_Privacy.asp", tabName: "<#menu_privacy#>"},
+					{url: "Tools_OtherSettings.asp", tabName: "Tweaks"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				]
 			},
