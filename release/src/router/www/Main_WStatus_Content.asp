@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html xmlns:v>
 <head>
@@ -257,7 +257,7 @@ function display_clients(clientsarray, obj, unit) {
 				nmapentry = true;
 
 			hostname = client[2];	// Name
-			if (nmapentry && (hostname == "*" || hostname == "")) {
+			if (nmapentry && (hostname == "*" || hostname == "<unknown>")) {
 				if (clientList[mac].nickName != "")
 					hostname = clientList[mac].nickName;
 				else if (clientList[mac].name != "")
@@ -497,4 +497,3 @@ function hide_details_window(){
 </div>
 </body>
 </html>
-
