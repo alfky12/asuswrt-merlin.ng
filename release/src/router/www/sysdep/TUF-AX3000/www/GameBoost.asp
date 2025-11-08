@@ -213,12 +213,6 @@ const ts = Date.now();
 const token = hexMD5(salt+label_mac+ts).toLowerCase();
 const gu_url = "https://router.booster.gearupportal.com/h5/acce?gwSn="+label_mac+"&type=asuswrt&ts="+ts+"&token="+token;
 
-var label_mac = <% get_label_mac(); %>.toLowerCase();
-var salt = "hb7pNSB6FTB72n6S1EqwM9fjYDiHuNhK";
-var ts = Date.now();
-var token = hexMD5(salt+label_mac+ts).toLowerCase();
-var gu_url = "https://router.booster.gearupportal.com/h5/acce?gwSn="+label_mac+"&type=asuswrt&ts="+ts+"&token="+token;
-
 function initial(){
 	show_menu();
 	$("#FormTitle").addClass("GB_background");
