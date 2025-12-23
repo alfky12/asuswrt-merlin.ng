@@ -85,7 +85,7 @@ function pullLANIPList(obj){
 	var element = document.getElementById('ClientList_Block_PC');
 	var isMenuopen = element.offsetWidth > 0 || element.offsetHeight > 0;
 	if(isMenuopen == 0){
-		obj.src = "/images/arrow-top.gif"
+		obj.src = "/images/unfold_less.svg"
 		element.style.display = 'block';
 		document.form.rule_mac.focus();
 	}
@@ -94,7 +94,7 @@ function pullLANIPList(obj){
 }
 
 function hideClients_Block(){
-	document.getElementById("pull_arrow").src = "/images/arrow-down.gif";
+	document.getElementById("pull_arrow").src = "/images/unfold_more.svg";
 	document.getElementById('ClientList_Block_PC').style.display='none';
 }
 
@@ -422,7 +422,9 @@ function showhide_settings(state) {
 			   different custom servers to use.</p>
 			<br>
 			<p>A few special System options are available in the presets.  "No Redirection" will bypass a global redirection,
-			   and "Router" will force clients to use the DNS provided by the router's DHCP server (or, the router itself if it's not defined).
+			   and "Router" will force clients to use the router itself as their resolver.</p>
+			<br>
+			<p>Use a User Defined DNS entry if you need DNS Director to redirect to an IP configured in your DHCP settings.</p>
 		</div>
 
 			<!--=====Beginning of Main Content=====-->
@@ -490,7 +492,7 @@ function showhide_settings(state) {
 				<tr>
 					<td width="50%">
 						<input type="text" maxlength="17" style="margin-left:10px;width:255px;" autocorrect="off" autocapitalize="off" class="input_macaddr_table" name="rule_mac" onClick="hideClients_Block();" onKeyPress="return validator.isHWAddr(this,event)" placeholder="ex: <% nvram_get("lan_hwaddr"); %>">
-						<img id="pull_arrow" height="14px;" src="/images/arrow-down.gif" style="position:absolute;" onclick="pullLANIPList(this);" title="<#select_client#>">
+						<img id="pull_arrow" height="14px;" src="/images/unfold_more.svg" style="position:absolute;" onclick="pullLANIPList(this);" title="<#select_client#>">
 						<div id="ClientList_Block_PC" style="margin:0 0 0 52px" class="clientlist_dropdown"></div>
 					</td>
 					<td width="35%">
