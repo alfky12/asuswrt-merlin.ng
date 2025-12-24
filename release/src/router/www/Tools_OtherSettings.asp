@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html xmlns:v>
 <head>
@@ -17,7 +17,6 @@
 <script language="JavaScript" type="text/javascript" src="/validator.js"></script>
 <script language="JavaScript" type="text/javascript" src="/popup.js"></script>
 <script language="JavaScript" type="text/javascript" src="/help.js"></script>
-<script language="JavaScript" type="text/javascript" src="/tmmenu.js"></script>
 <script>
 
 function initial() {
@@ -73,17 +72,6 @@ function applyRule(){
 		document.form.tcp_last_ack.value +" 0";
 
 	document.form.ct_udp_timeout.value = document.form.udp_unreplied.value + " "+document.form.udp_assured.value;
-
-	if (based_modelid != "RT-AC86U") {
-		if (getRadioValue(document.form.cstats_enable) != "<% nvram_get("cstats_enable"); %>") {
-			if ( (getRadioValue(document.form.cstats_enable) == 1) && ("<% nvram_get("ctf_disable"); %>" == 0) )
-				FormActions("start_apply.htm", "apply", "reboot", "<% get_default_reboot_time(); %>");
-			else
-				document.form.action_script.value += ";restart_firewall;restart_cstats";
-		} else {
-			document.form.action_script.value += ";restart_cstats";
-		}
-	}
 
 	if (getRadioValue(document.form.dns_local_cache) != "<% nvram_get("dns_local_cache"); %>")
 		document.form.action_script.value += ";restart_dnsmasq";
@@ -289,3 +277,4 @@ function applyRule(){
 
 </body>
 </html>
+

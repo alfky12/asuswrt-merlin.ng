@@ -8,12 +8,6 @@
 AC_PREREQ([2.59])
 AC_INIT
 
-# Record which revision is being built
-if test -s "`which hg`" && test -d "$srcdir/.hg"; then
-	hgrev=`hg id -i -R "$srcdir"`
-	AC_MSG_NOTICE([Source directory Mercurial base revision $hgrev])
-fi
-
 ORIGCFLAGS="$CFLAGS"
 LATE_CFLAGS=""
 # Checks for programs.
@@ -545,6 +539,7 @@ AC_CHECK_FUNCS(utmpname)
 AC_CHECK_FUNCS(endutxent getutxent getutxid getutxline pututxline )
 AC_CHECK_FUNCS(setutxent utmpxname)
 AC_CHECK_FUNCS(logout updwtmp logwtmp)
+AC_CHECK_FUNCS(setresgid)
 
 # Might be a macro. Might be sys/endian.h on BSDs
 AC_CHECK_HEADERS([endian.h])
@@ -553,7 +548,14 @@ AC_CHECK_FUNCS(htole64)
 AC_CHECK_DECL(htole64,
 	[
 	AC_DEFINE(HAVE_DECL_HTOLE64,1,htole64 is a macro)
-	],,)
+	],,[
+	#ifdef HAVE_ENDIAN_H
+		#include <endian.h>
+	#endif
+	#ifdef HAVE_SYS_ENDIAN_H
+		#include <sys/endian.h>
+	#endif
+	])
 
 # POSIX monotonic time
 AC_CHECK_FUNCS(clock_gettime)
@@ -886,6 +888,32 @@ if test -z "$no_ptc_check" ; then
 	else
 		AC_MSG_NOTICE([Not checking for /dev/ptc & /dev/pts since we're cross-compiling])
 	fi
+fi
+
+AC_CACHE_CHECK([for static_assert], ac_cv_have_static_assert, [
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <assert.h>
+		]],
+		[[ static_assert(1 == 1, "bad ram?"); ]])],
+		[ ac_cv_have_static_assert="yes" ],
+		[ ac_cv_have_static_assert="no" ]
+	)
+])
+if test "$ac_cv_have_static_assert" = "yes" ; then
+	AC_DEFINE(HAVE_STATIC_ASSERT,1,Have static_assert)
+fi
+
+AC_CACHE_CHECK([for _Static_assert], ac_cv_have_underscore_static_assert, [
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <assert.h>
+		]],
+		[[ _Static_assert(1 == 1, "cosmic rays?"); ]])],
+		[ ac_cv_have_underscore_static_assert="yes" ],
+		[ ac_cv_have_underscore_static_assert="no" ]
+	)
+])
+if test "$ac_cv_have_underscore_static_assert" = "yes" ; then
+	AC_DEFINE(HAVE_UNDERSCORE_STATIC_ASSERT,1,Have _Static_assert)
 fi
 
 AC_EXEEXT

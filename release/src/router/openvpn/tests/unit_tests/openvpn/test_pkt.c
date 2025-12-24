@@ -174,6 +174,27 @@ const uint8_t client_ack_none_random_id[] = {
     0x85, 0xdb, 0x53, 0x56, 0x23, 0xb0, 0x2e
 };
 
+/* no tls-auth, P_ACK_V1, acks 0,1, and 2 */
+const uint8_t client_ack_123_none_random_id[] = {
+    0x28,
+    0xae, 0xb9, 0xaf, 0xe1, 0xf0, 0x1d, 0x79, 0xc8,
+    0x03,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x01,
+    0x00, 0x00, 0x00, 0x02,
+    0xdd, 0x85, 0xdb, 0x53, 0x56, 0x23, 0xb0, 0x2e
+};
+
+/* no tls-auth, P_CONTROL_V1, acks 0, msg-id 2 */
+const uint8_t client_control_none_random_id[] = {
+    0x20,
+    0xae, 0xb9, 0xaf, 0xe1, 0xf0, 0x1d, 0x79, 0xc8,
+    0x01,
+    0x00, 0x00, 0x00, 0x00,
+    0x02
+};
+
+
 struct tls_auth_standalone
 init_tas_auth(int key_direction)
 {
@@ -294,12 +315,10 @@ test_tls_decrypt_lite_auth(void **ut_state)
     assert_int_equal(verdict, VERDICT_VALID_RESET_V2);
     free_tls_pre_decrypt_state(&state);
 
-    free_tls_pre_decrypt_state(&state);
     /* The pre decrypt function should not modify the buffer, so calling it
      * again should have the same result */
     verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
     assert_int_equal(verdict, VERDICT_VALID_RESET_V2);
-    free_tls_pre_decrypt_state(&state);
 
     /* and buf memory should be equal */
     assert_memory_equal(BPTR(&buf), client_reset_v2_tls_auth, sizeof(client_reset_v2_tls_auth));
@@ -317,7 +336,6 @@ test_tls_decrypt_lite_auth(void **ut_state)
     assert_int_equal(verdict, VERDICT_INVALID);
     free_tls_pre_decrypt_state(&state);
 
-    free_tls_pre_decrypt_state(&state);
     /* Wrong key direction gives a wrong hmac key and should not validate */
     free_key_ctx_bi(&tas.tls_wrap.opt.key_ctx_bi);
     free_tas(&tas);
@@ -357,13 +375,10 @@ test_tls_decrypt_lite_none(void **ut_state)
     assert_int_equal(verdict, VERDICT_VALID_RESET_V2);
     free_tls_pre_decrypt_state(&state);
 
-    free_tls_pre_decrypt_state(&state);
     buf_reset_len(&buf);
     buf_write(&buf, client_reset_v2_tls_crypt, sizeof(client_reset_v2_none));
     verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
     assert_int_equal(verdict, VERDICT_VALID_RESET_V2);
-    free_tls_pre_decrypt_state(&state);
-
     free_tls_pre_decrypt_state(&state);
 
     /* This is not a reset packet and should trigger the other response */
@@ -429,6 +444,8 @@ test_verify_hmac_tls_auth(void **ut_state)
     hmac_ctx_t *hmac = session_id_hmac_init();
 
     struct link_socket_actual from = { 0 };
+    from.dest.addr.sa.sa_family = AF_INET;
+    from.dest.addr.in4.sin_addr.s_addr = ntohl(0x01020304);
     struct tls_auth_standalone tas = { 0 };
     struct tls_pre_decrypt_state state = { 0 };
 
@@ -443,7 +460,7 @@ test_verify_hmac_tls_auth(void **ut_state)
     assert_int_equal(verdict, VERDICT_VALID_CONTROL_V1);
 
     /* This is a valid packet but containing a random id instead of an HMAC id*/
-    bool valid = check_session_id_hmac(&state, &from.dest, hmac, 30);
+    bool valid = check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, false);
     assert_false(valid);
 
     free_tls_pre_decrypt_state(&state);
@@ -455,6 +472,90 @@ test_verify_hmac_tls_auth(void **ut_state)
 
 static void
 test_verify_hmac_none(void **ut_state)
+{
+    now = 1000;
+    hmac_ctx_t *hmac = session_id_hmac_init();
+
+    struct link_socket_actual from = { 0 };
+    from.dest.addr.sa.sa_family = AF_INET;
+    from.dest.addr.in4.sin_addr.s_addr = ntohl(0x01020304);
+
+    struct tls_auth_standalone tas = { 0 };
+    struct tls_pre_decrypt_state state = { 0 };
+
+    struct buffer buf = alloc_buf(1024);
+    enum first_packet_verdict verdict;
+
+    tas.tls_wrap.mode = TLS_WRAP_NONE;
+
+    buf_reset_len(&buf);
+    buf_write(&buf, client_ack_none_random_id, sizeof(client_ack_none_random_id));
+    verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
+    assert_int_equal(verdict, VERDICT_VALID_ACK_V1);
+
+    /* This packet has a random hmac, so it should fail to validate */
+    bool valid = check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true);
+    assert_false(valid);
+
+    struct session_id client_id = { { 0xae, 0xb9, 0xaf, 0xe1, 0xf0, 0x1d, 0x79, 0xc8 } };
+    assert_memory_equal(&client_id, &state.peer_session_id, sizeof(struct session_id));
+
+    struct session_id expected_id = calculate_session_id_hmac(client_id, &from.dest, hmac, 30, 0);
+
+    free_tls_pre_decrypt_state(&state);
+    buf_reset_len(&buf);
+
+    /* Write the packet again into the buffer but this time, replacing the peer packet
+     * id with the expected one */
+    buf_write(&buf, client_ack_none_random_id, sizeof(client_ack_none_random_id) - 8);
+    buf_write(&buf, expected_id.id, 8);
+
+    verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
+    assert_int_equal(verdict, VERDICT_VALID_ACK_V1);
+    valid = check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true);
+
+    assert_true(valid);
+
+    /* Our handwindow is 30 so the slices are half of that, so they are
+     * (975,990), (990, 1005), (1005, 1020), (1020, 1035), (1035, 1050)
+     * So setting time to the two future ones should work
+     */
+    now = 980;
+    assert_false(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+    now = 1040;
+    assert_false(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+    now = 1002;
+    assert_true(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+    now = 1022;
+    assert_true(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+    now = 1010;
+    assert_true(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+
+    /* Changing the IP address should make this invalid */
+    from.dest.addr.in4.sin_addr.s_addr = ntohl(0x01020305);
+    assert_false(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+
+    /* Change to the correct one again */
+    from.dest.addr.in4.sin_addr.s_addr = ntohl(0x01020304);
+    assert_true(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+
+    /* Modify the peer id, should now fail hmac verification */
+    buf_inc_len(&buf, -4);
+    buf_write_u32(&buf, 0x12345678);
+
+    free_tls_pre_decrypt_state(&state);
+    verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
+    assert_int_equal(verdict, VERDICT_VALID_ACK_V1);
+    assert_false(check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true));
+
+    free_tls_pre_decrypt_state(&state);
+    free_buf(&buf);
+    hmac_ctx_cleanup(hmac);
+    hmac_ctx_free(hmac);
+}
+
+static void
+test_verify_hmac_none_out_of_range_ack(void **ut_state)
 {
     hmac_ctx_t *hmac = session_id_hmac_init();
 
@@ -470,12 +571,27 @@ test_verify_hmac_none(void **ut_state)
     tas.tls_wrap.mode = TLS_WRAP_NONE;
 
     buf_reset_len(&buf);
-    buf_write(&buf, client_ack_none_random_id, sizeof(client_ack_none_random_id));
+    buf_write(&buf, client_ack_123_none_random_id, sizeof(client_ack_123_none_random_id));
+
+
     verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
     assert_int_equal(verdict, VERDICT_VALID_ACK_V1);
 
-    bool valid = check_session_id_hmac(&state, &from.dest, hmac, 30);
-    assert_true(valid);
+    /* should fail because it acks 2 */
+    bool valid = check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true);
+    assert_false(valid);
+    free_tls_pre_decrypt_state(&state);
+
+    /* Try test with the control with a too high message id now */
+    buf_reset_len(&buf);
+    buf_write(&buf, client_control_none_random_id, sizeof(client_control_none_random_id));
+
+    verdict = tls_pre_decrypt_lite(&tas, &state, &from, &buf);
+    assert_int_equal(verdict, VERDICT_VALID_CONTROL_V1);
+
+    /* should fail because it has message id 2 */
+    valid = check_session_hmac_and_pkt_id(&state, &from.dest, hmac, 30, true);
+    assert_false(valid);
 
     free_tls_pre_decrypt_state(&state);
     free_buf(&buf);
@@ -663,13 +779,14 @@ int
 main(void)
 {
     const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_verify_hmac_none),
         cmocka_unit_test(test_tls_decrypt_lite_none),
         cmocka_unit_test(test_tls_decrypt_lite_auth),
         cmocka_unit_test(test_tls_decrypt_lite_crypt),
         cmocka_unit_test(test_parse_ack),
         cmocka_unit_test(test_calc_session_id_hmac_static),
-        cmocka_unit_test(test_verify_hmac_none),
         cmocka_unit_test(test_verify_hmac_tls_auth),
+        cmocka_unit_test(test_verify_hmac_none_out_of_range_ack),
         cmocka_unit_test(test_generate_reset_packet_plain),
         cmocka_unit_test(test_generate_reset_packet_tls_auth),
         cmocka_unit_test(test_extract_control_message)

@@ -346,12 +346,6 @@ ifeq ($(BUILD_NAME),DSL-N55U-B)
 endif
 endif
 
-ifeq ($(HND_ROUTER),y)
-	rm -rf $(INSTALLDIR)/www/Main_TrafficMonitor_devdaily.asp
-	rm -rf $(INSTALLDIR)/www/Main_TrafficMonitor_devmonthly.asp
-	rm -rf $(INSTALLDIR)/www/Main_TrafficMonitor_devrealtime.asp
-endif
-
 ifneq ($(BUILD_NAME),DSL-N55U)
 ifneq ($(BUILD_NAME),DSL-N55U-B)
 ifneq ($(BUILD_NAME),RT-N56U)
@@ -1028,3 +1022,10 @@ update:
 	wget http://nw-dlcdnet.asus.com/plugin/js/pppIspList_V2.json -O ajax/pppIspList_V2.json
 	wget http://nw-dlcdnet.asus.com/plugin/js/DNS_List.json -O ajax/DNS_List.json
 
+# Legacy files no longer used by Asuswrt-Merlin
+	rm -rf $(INSTALLDIR)/www/tm.svg
+	rm -rf $(INSTALLDIR)/www/tmcal.js
+	rm -rf $(INSTALLDIR)/www/tmhist.js
+	rm -rf $(INSTALLDIR)/www/tmmenu.css
+	rm -rf $(INSTALLDIR)/www/tmmenu.js
+# End legacy files

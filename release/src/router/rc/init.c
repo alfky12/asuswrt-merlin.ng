@@ -119,6 +119,8 @@
 #include <openvpn_config.h>
 #endif
 
+#include <webapi.h>
+
 #ifdef RTCONFIG_TCODE
 extern int noasusddns(void);
 #endif
@@ -723,7 +725,10 @@ wl_defaults(void)
 #if defined(RTCONFIG_REALTEK) && defined(RTCONFIG_AMAS)
 			if(sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1") && subunit == 1){
 				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "1");
-			}
+#if defined(RTCONFIG_BCMWL6) && defined(RTCONFIG_PROXYSTA)
+			} else if (psta_exist_except(unit) && subunit == 1)
+				nvram_set(strcat_r(prefix, "bss_enabled", tmp), "0");
+#endif
 #endif
 #ifdef RTCONFIG_WIRELESSREPEATER
 			if (sw_mode() == SW_MODE_REPEATER) {
@@ -12303,9 +12308,6 @@ int init_nvram(void)
 #ifdef RTCONFIG_BRCM_HOSTAPD
 		add_rc_support("wpa3");
 #endif
-#if defined(TUFAX3000) || defined(TUFAX5400)
-		add_rc_support("tuf");
-#endif
 #ifdef RTAX58U
 		if (!strncmp(nvram_safe_get("territory_code"), "CX", 2)) {
 			add_rc_support("nz_isp");
@@ -13236,7 +13238,6 @@ int init_nvram(void)
 #ifdef RTCONFIG_BRCM_HOSTAPD
 		add_rc_support("wpa3");
 #endif
-		add_rc_support("tuf");
 		break;
 #endif
 
@@ -13816,7 +13817,7 @@ _dprintf("%s: set autowan_ifnames to be \"eth0 eth1\"\n", __func__);
 			nvram_set("eth_ifnames", "eth0 eth1");
 			nvram_set("amas_ethif_type", "8 4");
 			nvram_set("eth_priority", "0 2 1 1 1 1");		// eth0: 2.5G(idx:0,prio:2,used:1) > eth1: 1G(idx:1,prio:1,used:1)
-			nvram_set("wired_ifnames", "eth1 eth2 eth3 eth4");
+			nvram_set("wired_ifnames", "eth2 eth3 eth4");
 			nvram_set("sta_ifnames", "eth5 eth7 eth6");
 			nvram_set("sta_priority", "2 0 5 1 5 1 4 1 6 2 3 1");	// 2.4G:(prio:5, used:1), 5G:(prio:4, used:1), 6G:(prio:3, used:1)
 		} else {
@@ -14182,7 +14183,6 @@ _dprintf("%s: set autowan_ifnames to be \"eth0 eth1\"\n", __func__);
 #ifdef RTCONFIG_BRCM_HOSTAPD
 		add_rc_support("wpa3");
 #endif
-		add_rc_support("tuf");
 
 		break;
 #endif
@@ -18865,6 +18865,10 @@ NO_USB_CAP:
 	if(!nvram_match("forget_it", ""))
 		add_rc_support("defpass");
 
+#ifdef RTCONFIG_SECURE_BY_DEFAULT
+	add_rc_support("secure_default");
+#endif
+
 	return 0;
 }  // end of init_nvram
 
@@ -19245,6 +19249,8 @@ int init_nvram2(void)
 		nvram_set("ddns_server_x", "");
 		nvram_commit();
 	}
+
+	detect_vul_scan();
 
 	return 0;
 }  // end of init_nvram2
@@ -19992,6 +19998,10 @@ static void sysinit(void)
 #if !defined(RTCONFIG_QCA)
 	int model;
 #endif
+#if defined(RTCONFIG_AMAS)
+    char amas_wlc_last_pap[] = "amas_wlcXXX_last_pap", amas_wlc_try_target_bssid[] = "amas_wlcXXX_try_target_bssid";
+    int k;
+#endif
 
 #ifdef HND_ROUTER
 	_dprintf("\nLaunch boot...\n");
@@ -20541,6 +20551,13 @@ def_boot_reinit:
 #ifdef RTCONFIG_MSSID_PRELINK
 	nvram_unset("plk_set");
 #endif
+	for(k=0; k<num_of_wl_if(); k++)
+	{
+		snprintf(amas_wlc_last_pap, sizeof(amas_wlc_last_pap), "amas_wlc%d_last_pap", k);
+		snprintf(amas_wlc_try_target_bssid, sizeof(amas_wlc_try_target_bssid), "amas_wlc%d_try_target_bssid", k);
+		nvram_unset(amas_wlc_last_pap);
+		nvram_unset(amas_wlc_try_target_bssid);
+	}
 #endif
 	init_nvram();  // for system indepent part after getting model
 

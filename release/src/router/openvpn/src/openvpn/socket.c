@@ -1270,7 +1270,7 @@ socket_do_accept(socket_descriptor_t sd,
     {
         /* set socket file descriptor to not pass across execs, so that
          * scripts don't have access to it */
-        set_cloexec(sd);
+        set_cloexec(new_sd);
     }
     return new_sd;
 }
@@ -2148,7 +2148,7 @@ create_socket_dco_win(struct context *c, struct link_socket *sock,
         c->c1.tuntap = tt;
     }
 
-    dco_create_socket(c->c1.tuntap->hand,
+    dco_create_socket(c->c1.tuntap->hand, &c->c1.tuntap->dco_new_peer_ov,
                       sock->info.lsa->current_remote,
                       sock->bind_local, sock->info.lsa->bind_local,
                       get_server_poll_remaining_time(sock->server_poll_timeout),

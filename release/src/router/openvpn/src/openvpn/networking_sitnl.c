@@ -28,10 +28,12 @@
 
 #include "dco.h"
 #include "errlevel.h"
+#include "fdmisc.h"
 #include "buffer.h"
 #include "misc.h"
 #include "networking.h"
 #include "proto.h"
+#include "route.h"
 
 #include <errno.h>
 #include <string.h>
@@ -164,6 +166,9 @@ sitnl_socket(void)
         msg(M_WARN, "%s: cannot open netlink socket", __func__);
         return fd;
     }
+
+    /* set close on exec to avoid child processes access the socket */
+    set_cloexec(fd);
 
     if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf)) < 0)
     {
@@ -798,6 +803,13 @@ sitnl_addr_set(int cmd, uint32_t flags, int ifindex, sa_family_t af_family,
     if (local)
     {
         SITNL_ADDATTR(&req.n, sizeof(req), IFA_LOCAL, local, size);
+    }
+
+    if (af_family == AF_INET && local && !remote && prefixlen <= 30)
+    {
+        inet_address_t broadcast = *local;
+        broadcast.ipv4 |= htonl(~netbits_to_netmask(prefixlen));
+        SITNL_ADDATTR(&req.n, sizeof(req), IFA_BROADCAST, &broadcast, size);
     }
 
     ret = sitnl_send(&req.n, 0, 0, NULL, NULL);

@@ -61,6 +61,7 @@ extern runopts opts;
 int readhostkey(const char * filename, sign_key * hostkey,
 	enum signkey_type *type);
 void load_all_hostkeys(void);
+void disable_sig_except(enum signature_type sig_type);
 
 typedef struct svr_runopts {
 
@@ -194,7 +195,12 @@ typedef struct cli_runopts {
 	unsigned int netcat_port;
 #endif
 #if DROPBEAR_CLI_PROXYCMD
+	/* A proxy command to run via the user's shell */
 	char *proxycmd;
+#endif
+#if DROPBEAR_CLI_MULTIHOP
+	/* Similar to proxycmd, but is arguments for execve(), not shell */
+	char **proxyexec;
 #endif
 	const char *bind_arg;
 	char *bind_address;
