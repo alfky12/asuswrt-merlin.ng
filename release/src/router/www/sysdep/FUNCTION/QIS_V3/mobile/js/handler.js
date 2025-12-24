@@ -129,14 +129,9 @@ apply.login = function(){
 			return false;
 		}
 
-		if(httpUserInput.val() == httpPassInput.val()){
-			httpUserInput.showTextHint(`<#JS_validLoginPWD_same#>`);
-			return false;
-		}
-
 		/* check password */
 		if(!use_defpass){
-			if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){
+			if(isSku("KR") || isSku("SG") || isSku("AA")){
 				var isValidKRSkuPwd = validator.KRSkuPwd(httpPassInput.val())
 				if(isValidKRSkuPwd.isError){
 					httpPassInput.showTextHint(isValidKRSkuPwd.errReason);
@@ -163,11 +158,7 @@ apply.login = function(){
 				return false;
 			}
 			else if(httpPassInput.val().length > 32){
-				var hintMaxPassword = `<#JS_max_password#>`;
-				if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){
-					hintMaxPassword = hintMaxPassword.replace("5", "10");
-				}
-				httpPassInput.showTextHint(hintMaxPassword);
+				httpPassInput.showTextHint("<#JS_max_password#>");
 				return false;
 			}
 
@@ -2756,7 +2747,7 @@ goTo.Login = function(){
 			}
 		});
 
-	if(isSku("KR") || isSku("SG") || isSku("AA") || isSupport("secure_default")){
+	if(isSku("KR") || isSku("SG") || isSku("AA")){
 		$("#login_passwd_KR").show();
 	}
 
@@ -2764,6 +2755,7 @@ goTo.Login = function(){
 		$("#defpass_checkbox").enableCheckBox(true);
 		$("#defpass_checkbox").change();
 		$("#login_name .titleMain").html("<#Local_login#>");
+		$("#login_name #login_desc").html(str_local_login_desc);
 		$("#login_name #http_username_title").html("<#HSDPAConfig_Username_itemname#>");
 		var find_local_login_pw = str_find_st.replace("%@", "<#passwd_local#>");
 		$("#local_login_title_container").unbind("click").click(function(e){
@@ -3955,7 +3947,6 @@ goTo.wlcManual = function(){
 };
 
 goTo.Wireless = function(){
-	var str_wifi6e_legacy_hint = `<#Wireless_SSID_hint3_new#>`.replace("%1$@", "6").replace("%2$@", "2.4").replace("%3$@", "5").replace("%4$@", "6");
 	function genWirelessInputField(__wlArray){
 		$("#wlInputField")
 			.hide()
@@ -4033,7 +4024,6 @@ goTo.Wireless = function(){
 		}
 
 		if(get_wl_unit_by_band("6G") != "" && qisPostData.smart_connect_x != '0'){
-			$('#wifi6e_legacy_hint').html(str_wifi6e_legacy_hint);
 			$('#wifi6e_legacy_hint').show();
 		}
 		setupFronthaulNetwork(qisPostData.smart_connect_x);
@@ -4319,7 +4309,7 @@ goTo.Update = function(){
 	$("#desktop_applyBtn_update").remove();
 	$("#mobile_applyBtn_update").remove();
 //
-
+	
 	if(systemVariable.isNewFw == 2 && systemVariable.forceLevel == 1){
 		$("#desktop_abortBtn_update").remove();
 		$("#mobile_abortBtn_update").remove();
@@ -4514,7 +4504,6 @@ goTo.Finish = function(){
 	}
 
 	if(get_wl_unit_by_band("6G") != "" && qisPostData.smart_connect_x != '0'){
-		$('#wifi6e_legacy_hint').html(str_wifi6e_legacy_hint);
 		$('#wifi6e_legacy_hint_summary').show();
 	}
 	
@@ -5754,7 +5743,7 @@ goTo.site2site_Finish = function(){
 							return wl_item.ssid_ori;
 					}()));
 					$("#site2site_summary_page #" + wl_idx + " [data-container=wl_info]").show().append($ssid);
-					var $key = $("<div>").html(htmlEnDeCode.htmlEncode("<#QIS_finish_wireless_item3#>: " + wl_item.key_new));
+					var $key = $("<div>").html(htmlEnDeCode.htmlEncode("<#QIS_finish_wireless_item2#>: " + wl_item.key_new));
 					$("#site2site_summary_page #" + wl_idx + " [data-container=wl_info]").show().append($key);
 
 					var specific_wl_ifname = wl_ifname_mapping.filter(function(item, index, array){
