@@ -10441,8 +10441,7 @@ wdp:
 	if (++ntpd_timer >= DAY_PERIOD) {
 		ntpd_timer = 0;
 		logmessage("ntpd", "Daily service restart");
-		stop_ntpd();
-		start_ntpd();
+		notify_rc("restart_ntpd");
 	}
 #endif
 }
