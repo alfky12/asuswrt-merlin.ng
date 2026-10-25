@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: 388.12_2-GPL_25575
-          fetch-depth: 200
+          fetch-depth: 0
 
       - name: Merge upstream saja (tanpa GPL/blob 25633)
         run: |
@@ -39,8 +39,16 @@ jobs:
           fi
 
           git remote add rmerl https://github.com/RMerl/asuswrt-merlin.ng.git
-          git fetch --filter=blob:none --depth 2000 rmerl 3004.388
-          git fetch --filter=blob:none rmerl tag 3004.388.12_2
+          # Fetch PENUH tanpa filter dan tanpa batas kedalaman.
+          # Alasan: fetch hemat (blob:none/shallow) di run #3 gagal
+          # saat cherry-pick curl 8.17 meminta blob dadakan dari
+          # promisor remote ("not our ref" / "could not fetch from
+          # promisor remote"), padahal bukan konflik file. Dengan
+          # fetch penuh, semua blob sudah ada sebelum cherry-pick
+          # dimulai, jadi tidak ada lagi unduhan dadakan di tengah
+          # pick.
+          git fetch rmerl 3004.388
+          git fetch rmerl tag 3004.388.12_2
 
           MERGE_BASE=280221387bccd9c8d1f54401eb33868c0f68fb65
           TARGET=433fc608f5fc1689f3d3c3ab5cd2a7d57102260f
