@@ -58,21 +58,29 @@ jobs:
           exec 3< /tmp/cherry-list.txt
           while IFS= read -r sha <&3; do
             echo "PICK $sha $(git log -1 --format=%s "$sha")"
-            if git cherry-pick "$sha" < /dev/null > /tmp/cherry-last.log 2>&1; then
+            if git cherry-pick "$sha" < /dev/null > /tmp/cherry-pick-initial.log 2>&1; then
               continue
             fi
-            # Daftar file konflik yang andal, termasuk add/add (AA):
-            # git ls-files -u, bukan git diff --diff-filter=U saja.
+            echo "PICK GAGAL $sha, log awal cherry-pick:"
+            cat /tmp/cherry-pick-initial.log
+            echo "CHERRY_PICK_HEAD ada? $(test -f .git/CHERRY_PICK_HEAD && echo YA || echo TIDAK)"
+            echo "File konflik (ls-files -u):"
+            git ls-files -u
+            echo "Baris status unmerged (AA/UU/DU/UD/AU/UA/DD):"
+            git status --porcelain | grep -E '^(AA|UU|DU|UD|AU|UA|DD)' || echo "(tidak ada baris unmerged di status)"
+            # Kalau tidak ada cherry-pick yang berjalan, ini BUKAN konflik
+            # isi file, melainkan kegagalan lain (misal blob gagal diunduh
+            # atau alasan git lainnya). Jangan coba continue/skip, karena
+            # itu hanya menutupi alasan aslinya dengan pesan
+            # "no cherry-pick in progress". Berhenti di sini dengan
+            # log awal di atas, branch belum di-push.
+            if [ ! -f .git/CHERRY_PICK_HEAD ]; then
+              echo "BERHENTI: pick gagal tanpa cherry-pick yang berjalan, lihat log awal di atas."
+              exit 1
+            fi
             conflicts=$(git ls-files -u | awk '{print $4}' | sort -u)
             echo "CONFLICT pada $sha:"
             echo "$conflicts"
-            echo "Status:"
-            git status --porcelain | head -50
-            # Hanya konflik yang sudah diketahui boleh diselesaikan otomatis:
-            # version.conf dan Changelog dipertahankan versi cabang ini dulu,
-            # SEMUA file di bawah release/src/router/curl/ diambil versi
-            # upstream (curl-nya ikut di-update ke 8.17, jadi file tesnya
-            # harus ikut versi 8.17, bukan hanya 6 file yang tercatat lokal).
             bad=0
             for f in $conflicts; do
               case "$f" in
@@ -98,10 +106,43 @@ jobs:
               git cherry-pick --abort || true
               exit 1
             fi
+            if [ ! -f .git/CHERRY_PICK_HEAD ]; then
+              echo "BERHENTI: cherry-pick hilang setelah resolve, tidak bisa continue."
+              exit 1
+            fi
             # Commit dokumentasi/bump versi bisa jadi kosong setelah
             # version.conf/Changelog dipertahankan; lewati saja, karena
-            # versi dan changelog diedit manual di akhir.
-            GIT_EDITOR=true EDITOR=true git cherry-pick --continue < /dev/null > /tmp/cherry-last.log 2>&1 || git cherry-pick --skip < /dev/null > /tmp/cherry-last.log 2>&1 || { echo "Gagal melanjutkan cherry-pick untuk $sha:"; cat /tmp/cherry-last.log; git status --porcelain | head -50; git ls-files -u; exit 1; }
+            # versi dan changelog diedit manual di akhir. Jangan coba
+            # skip secara membabi buta bila continue gagal karena alasan
+            # lain: tampilkan log continue-nya dulu.
+            if ! GIT_EDITOR=true EDITOR=true git cherry-pick --continue < /dev/null > /tmp/cherry-continue.log 2>&1; then
+              echo "Continue gagal, log continue:"
+              cat /tmp/cherry-continue.log
+              echo "Status unmerged saat continue gagal:"
+              git status --porcelain | grep -E '^(AA|UU|DU|UD|AU|UA|DD)' || echo "(tidak ada)"
+              # Hanya skip bila commit menjadi kosong (kasus dokumentasi/
+              # bump versi), bukan bila ada konflik tersisa.
+              if [ "$(git ls-files -u | wc -l)" -eq 0 ] && [ ! -f .git/CHERRY_PICK_HEAD ]; then
+                echo "Continue gagal tapi tidak ada konflik dan tidak ada cherry-pick berjalan; lanjut ke commit berikutnya."
+                continue
+              fi
+              if git ls-files -u | grep -q .; then
+                echo "Masih ada konflik, berhenti."
+                git cherry-pick --abort || true
+                exit 1
+              fi
+              # Coba skip hanya bila ini commit dokumentasi/bump versi
+              # yang kosong setelah resolve (pesan commit mengandung
+              # 'Updated documentation' atau 'Bumped revision').
+              msg=$(git log -1 --format=%s "$sha")
+              case "$msg" in
+                "Updated documentation"|"Bumped revision"*)
+                  git cherry-pick --skip < /dev/null || { echo "Skip juga gagal"; exit 1; } ;;
+                *)
+                  echo "Continue gagal untuk commit bukan dokumentasi/bump versi, berhenti."
+                  exit 1 ;;
+              esac
+            fi
           done
           exec 3<&-
 
