@@ -1,3 +1,7 @@
+3004.388.12_2-GPL_25575
+  - Upstream code to 3004.388.12_2
+  - GPL and binary blobs kept at 388_25575 (GPL 388_25633 and blobs 388_25633 excluded)
+
 Asuswrt-Merlin GNUton's builds Changelog
 ========================
 
