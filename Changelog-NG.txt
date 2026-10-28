@@ -1,3 +1,9 @@
+3004.388.13-dev-GPL_25575
+  - Upstream code to RMerl 3004.388 head f94f6ff8 (388.13 in development)
+  - Synced with gnuton master 14166d1a (11 commits picked, 4 skipped: 2 Changelog-only, 1 old 388.11_1 release manifest, 1 fork-PR build workflow)
+  - GPL and binary blobs kept at 388_25575 (no GPL/blob merge in the 388.12_2..388.13-dev range)
+  - AiProtection TUF override replaced by symlink to the main Merlin page (see following commit)
+
 3004.388.12_2-GPL_25575
   - Upstream code to 3004.388.12_2
   - GPL and binary blobs kept at 388_25575 (GPL 388_25633 and blobs 388_25633 excluded)
