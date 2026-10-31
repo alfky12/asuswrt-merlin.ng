@@ -1,3 +1,9 @@
+3004.388.13-beta1_GPL_25575
+  - Upstream code to RMerl 3004.388 head 94195d9b32 (3004.388.13 beta1)
+  - Synced with upstream 3004.388 beta1: 10 commits picked, 2 skipped (1 Updated changelog, 1 Bumped revision to beta1, karena versi/changelog diedit manual)
+  - GPL and binary blobs kept at 388_25575 (no GPL/blob commit in the f94f6ff8..94195d9b32 range)
+  - OpenVPN updated to 2.7.8, miniupnpd CVE-2026-107159 fix, haveged 1.9.27
+
 3004.388.13-dev-GPL_25575
   - Upstream code to RMerl 3004.388 head f94f6ff8 (388.13 in development)
   - Synced with gnuton master 14166d1a (11 commits picked, 4 skipped: 2 Changelog-only, 1 old 388.11_1 release manifest, 1 fork-PR build workflow)
