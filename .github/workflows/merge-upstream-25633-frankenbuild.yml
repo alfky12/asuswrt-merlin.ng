@@ -169,7 +169,7 @@ jobs:
               # 'Updated documentation' atau 'Bumped revision').
               msg=$(git log -1 --format=%s "$sha")
               case "$msg" in
-                "Updated documentation"|"Bumped revision"*)
+                "Updated documentation"|"Updated changelog"|"Bumped revision"*)
                   git cherry-pick --skip < /dev/null || { echo "Skip juga gagal"; exit 1; } ;;
                 *)
                   echo "Continue gagal untuk commit bukan dokumentasi/bump versi, berhenti."
