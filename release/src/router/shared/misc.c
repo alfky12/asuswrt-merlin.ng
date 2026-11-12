@@ -7713,7 +7713,3 @@ char *get_ddns_macaddr(void)
 
 	return mac;
 }
-
-void init_asus_pp_eula(void)
-{
-}
