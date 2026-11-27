@@ -422,7 +422,9 @@ function showhide_settings(state) {
 			   different custom servers to use.</p>
 			<br>
 			<p>A few special System options are available in the presets.  "No Redirection" will bypass a global redirection,
-			   and "Router" will force clients to use the DNS provided by the router's DHCP server (or, the router itself if it's not defined).
+			   and "Router" will force clients to use the router itself as their DNS server.  Client-specific rules take precedence over the global redirection.</p>
+			<br>
+			<p>DNS Director only redirects DNS queries that reach the router.  Use a User Defined entry to redirect clients that query the router or an external DNS server to the DNS server configured in your DHCP settings.</p>
 		</div>
 
 			<!--=====Beginning of Main Content=====-->
